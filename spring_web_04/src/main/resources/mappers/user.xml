@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sist.user.repository.mappers.user">
+
+
+    <select id="do_searchOne" 
+      parameterType="com.sist.user.domain.UserVO"
+      resultType="com.sist.user.domain.UserVO">
+        SELECT id,    
+			  name,       
+			  password,   
+			  u_level as ulevel,
+			  u_level as levelintvalue,      
+			  login,      
+			  recommend,  
+			  mail,       
+			  reg_dt,     
+			  1 no,       
+			  1 total_cnt 
+		FROM USERS   
+		where id = #{id}  
+    </select>  
+	
+	<update id="do_update" parameterType="com.sist.user.domain.UserVO"  >
+		UPDATE USERS
+		   SET NAME      = #{name, jdbcType=VARCHAR}
+		      ,PASSWORD  = #{password, jdbcType=VARCHAR}
+		      ,U_LEVEL   = #{ulevel}
+		      ,LOGIN     = #{login, jdbcType=VARCHAR}
+		      ,RECOMMEND = #{recommend, jdbcType=VARCHAR}
+		      ,MAIL      = #{mail, jdbcType=VARCHAR}
+		      ,REG_DT    = sysdate
+		 WHERE ID        = #{id, jdbcType=VARCHAR}
+	</update>
+	
+	
+	<delete id="do_delete"  
+	parameterType="UserVO">
+	   DELETE FROM USERS
+        WHERE ID = #{id}   
+	</delete>
+	
+	<update id="do_save"  
+	   parameterType="com.sist.user.domain.UserVO">
+	   INSERT INTO USERS(ID,NAME,PASSWORD,U_LEVEL,LOGIN,RECOMMEND,MAIL,REG_DT) 
+             VALUES (#{id},#{name},#{password},#{ulevel},#{login},#{recommend},#{mail},SYSDATE)
+    </update>     
+    
+    <sql id="BaseConditionForFilter">    
+       <where>   
+        <choose>
+            <when test="SEARCH_DIV == '10'">
+                 A.ID LIKE  #{SEARCH_WORD} || '%'         
+            </when>
+            <when test="SEARCH_DIV == '20'">
+                AND A.name LIKE  #{SEARCH_WORD} || '%'     
+            </when>
+            <when test="SEARCH_DIV == '30'">
+                AND A.u_Level LIKE   #{SEARCH_WORD} || '%'     
+            </when>
+                        
+            <otherwise></otherwise>
+        </choose>
+        </where>       
+    </sql>
+        
+    <select id="do_search" 
+          parameterType="String"
+          resultType="com.sist.user.domain.UserVO">
+         
+         select T1.id                                                
+               ,T1.name                                              
+               ,T1.password                                          
+               ,T1.u_level                                           
+               ,T1.login                                             
+               ,T1.recommend                                         
+               ,T1.mail                                              
+               ,TO_CHAR(T1.reg_dt,'YYYY-MM-DD') AS reg_dt            
+               ,T1.total_cnt  as totalNo                                       
+               ,T1.RNUM as no                                        
+           from(                                                     
+           select A.*                                                
+                  ,ROW_NUMBER() OVER(ORDER BY A.reg_dt DESC) as RNUM 
+                  ,COUNT(*) OVER () AS TOTAL_CNT                     
+             from USERS A
+            <include refid="BaseConditionForFilter" />
+       <![CDATA[     
+         order by reg_dt desc                            
+           )T1                                              
+        WHERE RNUM BETWEEN (#{PAGE_SIZE} * (#{PAGE_NUM}-1)+1) AND (#{PAGE_SIZE} * (#{PAGE_NUM}-1)+#{PAGE_SIZE})    
+        ]]>   
+    </select>         
+     
+</mapper>

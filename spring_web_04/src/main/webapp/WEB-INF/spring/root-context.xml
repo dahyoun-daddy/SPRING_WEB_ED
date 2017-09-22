@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" 
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-4.3.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+    
+    <!--Tx 트랜잭션 어드바이스 빈 -->
+    <bean id="transactionAdvice" 
+        class="com.sist.common.TransactionAdvice">
+        <property name="transactionManager" 
+        ref="transactionManager"/>
+    </bean> 
+    
+    <!--Tx PointCut -->
+    <bean  id="transactionPointcut" 
+        class="com.sist.common.NameMatchClassMethodPointcut" >
+        <property name="mappedClassName" value="*SvcImpl" />
+        <property name="mappedName" value="*tx"></property>        
+    </bean>    
+    
+    <!--Tx Advisor -->
+    <bean  id="transactionAdvisor"  
+      class="org.springframework.aop.support.DefaultPointcutAdvisor">
+      <property name="advice" ref="transactionAdvice" />
+      <property name="pointcut" ref="transactionPointcut" />
+    </bean>
+    
+    <!--Tx DataSourceTransactionManager -->
+    <bean id="transactionManager"
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>    
+    
+        
+	<!-- Root Context: defines shared resources visible to all other web components -->
+    <bean id="dataSource" 
+        class="org.apache.commons.dbcp.BasicDataSource"  
+        destroy-method="close"
+        p:driverClassName="oracle.jdbc.driver.OracleDriver"
+        p:url="jdbc:oracle:thin:@211.238.142.150:1521:orcl"
+        p:username="sist"
+        p:password="git1234"
+        p:maxActive="10"
+        p:maxIdle="5"
+        p:maxWait="-1" 
+    />   
+       
+    <bean id="dataSourceSpied" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="dataSource" />
+        <property name="logFormatter">
+            <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL]         :  "/>
+            </bean>  
+        </property>
+    </bean>  
+     
+    
+    <!-- SqlSessionFactoryBean 생성 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- mybatis-config.xml 파일이 스프링이 동작할 때 같이 동작하도록 설정한 것. -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="mapperLocations" value="classpath:mappers/**/*.xml"></property>
+    </bean>
+
+    <!-- sqlSession 을 SqlSessionTemplate으로 만든다. -->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate"
+        destroy-method="clearCache">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+        
+
+    
+    <!-- 어노테이션에 기반한 트랜잭션 활성화 -->
+    <tx:annotation-driven 
+    transaction-manager="transactionManager" />
+      
+    <!-- Root Context: defines shared resources visible to all other web components -->
+    <!-- File Upload:CommonMultipartResolver -->    
+    <bean  id="multipartResolver"
+    class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+       <property name="defaultEncoding" value="UTF-8" />
+       <!-- Upload File size="50*1024*1024" -->
+       <property name="maxUploadSize" value="52428800" />
+       <property name="maxInMemorySize" value="52428800" />
+    </bean>      
+</beans>
