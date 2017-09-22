@@ -1,9 +1,11 @@
 package com.sist.user;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -16,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -91,9 +94,16 @@ public class UserTest {
 		
 		mockMvc.perform(createMessage)
 		.andDo(print())
-        .andExpect(status().isOk()
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.id", is("SpMockMVC3")))
+        .andExpect(jsonPath("$.ulevel", is(1))) 
+        .andExpect(jsonPath("$.login", is(28))) 	
+        .andExpect(jsonPath("$.recommend", is(35)))
+        .andExpect(jsonPath("$.mail", is("jamesol@paran.com")))  
+        .andExpect(jsonPath("$.name", is("이상무")))          
+        .andExpect(jsonPath("$.password", is("888"))             		
         		);
-        
         
 	}
 }
