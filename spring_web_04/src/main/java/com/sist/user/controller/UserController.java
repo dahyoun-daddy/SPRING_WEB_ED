@@ -48,6 +48,33 @@ public class UserController {
     @Resource(name="downloadView")
     private View downloadView;
     
+    /**
+     * JUnit Controller Test
+     * @param req
+     * @return
+     */
+    @RequestMapping(value="test/hello.do",
+    		method=RequestMethod.GET)
+    public ModelAndView jamesGreeting(HttpServletRequest req) {
+    	ModelAndView modelAndView=new ModelAndView();
+    	String greeting = StringUtil.nvl(req.getParameter("name"),"없음");
+    	
+    	modelAndView.addObject("greeting",greeting);
+    	modelAndView.setViewName("test/hello");
+    	return modelAndView;
+    }
+    
+    @RequestMapping(value="test/hello.do",
+    		method=RequestMethod.POST)
+    public ModelAndView jamesGreetingPost(HttpServletRequest req) {
+    	ModelAndView modelAndView=new ModelAndView();
+    	String greeting = StringUtil.nvl(req.getParameter("name"),"없음");
+    	
+    	modelAndView.addObject("greeting",greeting);
+    	modelAndView.setViewName("test/helloResult");
+    	return modelAndView;
+    }
+    
 	/**
 	 * ExcelUpload
 	 * @return
@@ -151,7 +178,7 @@ public class UserController {
 			,method=RequestMethod.POST
 			,produces="application/json;charset=utf8")
 	@ResponseBody
-	public String main(HttpServletRequest req) {
+	public String doSelectOne(HttpServletRequest req) {
 		log.debug("0================");
 		log.debug("0================");
 		UserVO inVO=new UserVO();
