@@ -43,7 +43,7 @@
     
         
 	<!-- Root Context: defines shared resources visible to all other web components -->
-    <bean id="dataSource" 
+    <bean id="dataSourceSpied" 
         class="org.apache.commons.dbcp.BasicDataSource"  
         destroy-method="close"
         p:driverClassName="oracle.jdbc.driver.OracleDriver"
@@ -55,8 +55,8 @@
         p:maxWait="-1" 
     />   
        
-    <bean id="dataSourceSpied" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
-        <constructor-arg ref="dataSource" />
+    <bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="dataSourceSpied" />
         <property name="logFormatter">
             <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
                 <property name="loggingType" value="MULTI_LINE" />
