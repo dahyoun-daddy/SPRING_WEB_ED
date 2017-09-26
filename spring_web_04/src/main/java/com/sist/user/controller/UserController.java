@@ -50,6 +50,7 @@ public class UserController {
     
     /**
      * JUnit Controller Test
+     * /test/hell.jsp ->test/hello.do ->
      * @param req
      * @return
      */
@@ -57,19 +58,20 @@ public class UserController {
     		method=RequestMethod.GET)
     public ModelAndView jamesGreeting(HttpServletRequest req) {
     	ModelAndView modelAndView=new ModelAndView();
-    	String greeting = StringUtil.nvl(req.getParameter("name"),"없음");
+    	String greeting = 
+    			StringUtil.nvl(req.getParameter("name"),"없음");
     	
     	modelAndView.addObject("greeting",greeting);
     	modelAndView.setViewName("test/hello");
     	return modelAndView;
     }
-    
+      
     @RequestMapping(value="test/hello.do",
     		method=RequestMethod.POST)
     public ModelAndView jamesGreetingPost(HttpServletRequest req) {
     	ModelAndView modelAndView=new ModelAndView();
     	String greeting = StringUtil.nvl(req.getParameter("name"),"없음");
-    	
+    	log.debug("_jamesGreetingPost88888");
     	modelAndView.addObject("greeting",greeting);
     	modelAndView.setViewName("test/helloResult");
     	return modelAndView;
@@ -168,7 +170,7 @@ public class UserController {
 		
 		return modelAndView;
 	}
-	
+
 	
 	
 	
@@ -371,7 +373,8 @@ public class UserController {
 	 * @return
 	 * @throws IOException
 	 */
-	@RequestMapping(value="user/do_delete.do")
+	@RequestMapping(value="user/do_delete.do",produces="application/json;charset=utf8")
+	@ResponseBody
 	public String do_delete(HttpServletRequest req) throws IOException {
 		UserVO inVO=new UserVO();
 		
@@ -379,7 +382,12 @@ public class UserController {
 		log.debug("inVO : "+inVO.getId()); 
 		int flag = userSvc.do_delete(inVO);
 		log.debug("flag : "+flag);
-		return "redirect:do_search.do";
+		Gson gson=new Gson();
+		JsonObject out=new JsonObject();
+		out.addProperty("flag", flag);
+		String retString = gson.toJson(out);
+		log.debug("0===============retString="+retString);
+		return retString;
 	}
 	
 }

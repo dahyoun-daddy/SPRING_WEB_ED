@@ -26,12 +26,13 @@ import org.springframework.test.web.ModelAndViewAssert;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.ModelAndView;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class) 
 @ContextConfiguration({
 	 "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
 	,"file:src/main/webapp/WEB-INF/spring/root-context.xml"})
@@ -54,7 +55,7 @@ public class UserTest {
 		
 	}
 	
-	//@Test
+	@Test
 	public void do_hello()throws Exception{
 		mockMvc.perform(post("/test/hello.do").param("name", "james"))
 		// 상태값은 OK가 나와야 함.
@@ -68,8 +69,11 @@ public class UserTest {
 		);
 	}
 
-	//@Test
+	@Test
 	public void do_save()throws Exception{
+		
+		String id="SpMockMVC4";
+		do_delete(id);
 		//param
 		MockHttpServletRequestBuilder createMessage = 
 				post("/user/do_save.do").param("id", "SpMockMVC4")
@@ -85,6 +89,30 @@ public class UserTest {
 			.andDo(print())
 			.andExpect(status().is3xxRedirection()
 			);
+
+		
+	}
+	
+	@Test
+	public void do_update()throws Exception{
+		String id="SpMockMVC4";
+		//param
+		MockHttpServletRequestBuilder createMessage = 
+				post("/user/do_save.do").param("id", "SpMockMVC4")
+				                  .param("u_level", "10")
+				                  .param("login", "38")
+				                  .param("recommend", "35")
+				                  .param("mail", "jamesol@paran.com1")
+				                  .param("name", "이상무1")
+				                  .param("password", "8881")
+				                  .param("workDiv", "update");
+		
+		mockMvc.perform(createMessage)
+			.andDo(print())
+			.andExpect(status().is3xxRedirection()
+			);
+
+		
 	}
 	
 	@Test
@@ -105,5 +133,16 @@ public class UserTest {
         .andExpect(jsonPath("$.password", is("888"))             		
         		);
         
+	}
+	
+	public void do_delete(String id)throws Exception{
+		//삭제
+		MockHttpServletRequestBuilder delMessage = 
+		post("/user/do_delete.do").param("id", id);
+	    ResultActions result = mockMvc.perform(delMessage);
+	    result.andDo(print());
+	    result.andExpect(status().isOk());
+	    result.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+	    result.andExpect(jsonPath("$.flag", is(0)));
 	}
 }
