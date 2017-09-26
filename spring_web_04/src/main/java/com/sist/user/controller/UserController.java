@@ -215,7 +215,8 @@ public class UserController {
 	 * @return
 	 * @throws IOException 
 	 */
-	@RequestMapping(value="user/do_save.do")
+	@RequestMapping(value="user/do_save.do",produces="application/json;charset=utf8")
+	@ResponseBody
 	public String do_save(HttpServletRequest req)
 			throws IOException {
 		
@@ -247,8 +248,13 @@ public class UserController {
 		}
 		
 		log.debug("flag: "+flag);
-		
-		return "redirect:do_search.do";
+		Gson gson=new Gson();
+		JsonObject out=new JsonObject();
+		out.addProperty("flag", flag);
+		String retString = gson.toJson(out);
+		log.debug("0===============retString="+retString);
+		return retString;
+		//return "redirect:do_search.do";
 	}
 	@RequestMapping(value="user/do_search.do")
 	public ModelAndView do_search(HttpServletRequest req) {

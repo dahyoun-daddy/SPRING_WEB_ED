@@ -87,7 +87,7 @@ public class UserTest {
 		
 		mockMvc.perform(createMessage)
 			.andDo(print())
-			.andExpect(status().is3xxRedirection()
+			.andExpect(status().isOk()
 			);
 
 		
@@ -97,8 +97,8 @@ public class UserTest {
 	public void do_update()throws Exception{
 		String id="SpMockMVC4";
 		//param
-		MockHttpServletRequestBuilder createMessage = 
-				post("/user/do_save.do").param("id", "SpMockMVC4")
+		MockHttpServletRequestBuilder messageUpdate = 
+				post("/user/do_save.do").param("id", "SpMockMVC3")
 				                  .param("u_level", "10")
 				                  .param("login", "38")
 				                  .param("recommend", "35")
@@ -107,11 +107,28 @@ public class UserTest {
 				                  .param("password", "8881")
 				                  .param("workDiv", "update");
 		
-		mockMvc.perform(createMessage)
+		mockMvc.perform(messageUpdate)
 			.andDo(print())
-			.andExpect(status().is3xxRedirection()
+			.andExpect(status().is2xxSuccessful()
 			);
 
+		//단건수정
+		MockHttpServletRequestBuilder selectOne = 
+				post("/user/userForm.do").param("id", "SpMockMVC3");	
+		
+		mockMvc.perform(selectOne)
+		.andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(jsonPath("$.id", is("SpMockMVC3")))
+        .andExpect(jsonPath("$.ulevel", is(10))) 
+        .andExpect(jsonPath("$.login", is(38))) 	
+        .andExpect(jsonPath("$.recommend", is(35)))
+        .andExpect(jsonPath("$.mail", is("jamesol@paran.com1")))  
+        .andExpect(jsonPath("$.name", is("이상무1")))          
+        .andExpect(jsonPath("$.password", is("8881"))             		
+        		);
+		
 		
 	}
 	
@@ -125,12 +142,12 @@ public class UserTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(jsonPath("$.id", is("SpMockMVC3")))
-        .andExpect(jsonPath("$.ulevel", is(1))) 
-        .andExpect(jsonPath("$.login", is(28))) 	
+        .andExpect(jsonPath("$.ulevel", is(10))) 
+        .andExpect(jsonPath("$.login", is(38))) 	
         .andExpect(jsonPath("$.recommend", is(35)))
-        .andExpect(jsonPath("$.mail", is("jamesol@paran.com")))  
-        .andExpect(jsonPath("$.name", is("이상무")))          
-        .andExpect(jsonPath("$.password", is("888"))             		
+        .andExpect(jsonPath("$.mail", is("jamesol@paran.com1")))  
+        .andExpect(jsonPath("$.name", is("이상무1")))          
+        .andExpect(jsonPath("$.password", is("8881"))             		
         		);
         
 	}
@@ -143,6 +160,6 @@ public class UserTest {
 	    result.andDo(print());
 	    result.andExpect(status().isOk());
 	    result.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
-	    result.andExpect(jsonPath("$.flag", is(0)));
+	    //result.andExpect(jsonPath("$.flag", is(0)));
 	}
 }
