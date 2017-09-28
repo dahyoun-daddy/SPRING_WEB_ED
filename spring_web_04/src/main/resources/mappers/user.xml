@@ -5,6 +5,45 @@
 
 <mapper namespace="com.sist.user.repository.mappers.user">
 
+    <sql id="BaseConditionForFilter">    
+       <where>   
+        <choose>
+            <when test="SEARCH_DIV == '10'">
+                 T1.ID LIKE  #{SEARCH_WORD} || '%'         
+            </when>
+            <when test="SEARCH_DIV == '20'">
+                AND T1.name LIKE  #{SEARCH_WORD} || '%'     
+            </when>
+            <when test="SEARCH_DIV == '30'">
+                AND T1.u_Level LIKE   #{SEARCH_WORD} || '%'     
+            </when>
+                        
+            <otherwise></otherwise>
+        </choose>
+        </where>       
+    </sql>
+    
+    
+    <select id="do_search_dynamic" 
+          parameterType="String"
+          resultType="com.sist.user.domain.UserVO">
+         <include refid="com.sist.common.pagingPre"/>
+         <![CDATA[
+         select T1.id                                                
+               ,T1.name                                              
+               ,T1.password                                          
+               ,T1.u_level                                           
+               ,T1.login                                             
+               ,T1.recommend                                         
+               ,T1.mail                                              
+               ,TO_CHAR(T1.reg_dt,'YYYY-MM-DD') AS reg_dt 
+               ,ROW_NUMBER() OVER(ORDER BY T1.reg_dt DESC) as RNUM                                         
+           from USERS T1
+         ]]>
+        <include refid="BaseConditionForFilter" /> 
+        <include refid="com.sist.common.pagingPost"/>
+
+    </select> 
 
     <select id="do_searchOne" 
       parameterType="com.sist.user.domain.UserVO"
@@ -49,24 +88,15 @@
              VALUES (#{id},#{name},#{password},#{ulevel},#{login},#{recommend},#{mail},SYSDATE)
     </update>     
     
-    <sql id="BaseConditionForFilter">    
-       <where>   
-        <choose>
-            <when test="SEARCH_DIV == '10'">
-                 A.ID LIKE  #{SEARCH_WORD} || '%'         
-            </when>
-            <when test="SEARCH_DIV == '20'">
-                AND A.name LIKE  #{SEARCH_WORD} || '%'     
-            </when>
-            <when test="SEARCH_DIV == '30'">
-                AND A.u_Level LIKE   #{SEARCH_WORD} || '%'     
-            </when>
-                        
-            <otherwise></otherwise>
-        </choose>
-        </where>       
-    </sql>
+
         
+
+    
+    
+
+
+    
+            
     <select id="do_search" 
           parameterType="String"
           resultType="com.sist.user.domain.UserVO">

@@ -47,7 +47,8 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public List<?> do_search(DTO dto) {
-		String statement = namespace +".do_search";
+		//String statement = namespace +".do_search";
+		String statement = namespace +".do_search_dynamic";
 		//Param
 		UserVO param=(UserVO)dto;
 		

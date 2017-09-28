@@ -14,7 +14,7 @@ PlatformTransactionManager transactionManager;
     
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
-	}
+	} 
 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
